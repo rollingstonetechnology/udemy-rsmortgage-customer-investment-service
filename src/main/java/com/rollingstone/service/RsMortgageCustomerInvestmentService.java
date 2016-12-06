@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.rollingstone.dao.jpa.RsMortgageCustomerInvestmentRepository;
 import com.rollingstone.domain.Investment;
 import com.rollingstone.domain.Customer;
+import com.rollingstone.domain.Employment;
 
 
 /*
@@ -33,20 +34,68 @@ public class RsMortgageCustomerInvestmentService {
 
     @Autowired
     GaugeService gaugeService;
+    
+    @Autowired
+   	private CustomerClient customerClient;
 
     public RsMortgageCustomerInvestmentService() {
     }
 
-    public Investment createInvestment(Investment investment) {
-        return customerInvestmentRepository.save(investment);
+    public Investment createInvestment(Investment investment) throws Exception {
+    	Investment createdInvestment = null;
+    	if (investment != null && investment.getCustomer() != null){
+    		
+    		log.info("In service employment create"+ investment.getCustomer().getId());
+    		if (customerClient == null){
+        		log.info("In customerClient null got customer");
+    		}
+    		else {
+    			log.info("In customerClient not null got customer");
+    		}
+    		
+    		Customer customer = customerClient.getCustomer((new Long(investment.getCustomer().getId())));
+    		
+    		if (customer != null){
+    			createdInvestment  = customerInvestmentRepository.save(investment);
+    		}else {
+    			log.info("Invalid Customer");
+    			throw new Exception("Invalid Customer");
+    		}
+    	}
+    	else {
+    			throw new Exception("Invalid Customer");
+    	}
+        return createdInvestment;
     }
 
     public Investment getInvestment(long id) {
         return customerInvestmentRepository.findOne(id);
     }
 
-    public void updateInvestment(Investment investment) {
-    	customerInvestmentRepository.save(investment);
+    public void updateInvestment(Investment investment) throws Exception {
+     	Investment createdInvestment = null;
+    	if (investment != null && investment.getCustomer() != null){
+    		
+    		log.info("In service employment create"+ investment.getCustomer().getId());
+    		if (customerClient == null){
+        		log.info("In customerClient null got customer");
+    		}
+    		else {
+    			log.info("In customerClient not null got customer");
+    		}
+    		
+    		Customer customer = customerClient.getCustomer((new Long(investment.getCustomer().getId())));
+    		
+    		if (customer != null){
+    			createdInvestment  = customerInvestmentRepository.save(investment);
+    		}else {
+    			log.info("Invalid Customer");
+    			throw new Exception("Invalid Customer");
+    		}
+    	}
+    	else {
+    			throw new Exception("Invalid Customer");
+    	}
     }
 
     public void deleteInvestment(Long id) {

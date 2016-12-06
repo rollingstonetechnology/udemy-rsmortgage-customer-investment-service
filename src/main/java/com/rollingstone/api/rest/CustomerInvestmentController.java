@@ -39,7 +39,7 @@ public class CustomerInvestmentController extends AbstractRestController {
             produces = {"application/json", "application/xml"})
     @ResponseStatus(HttpStatus.CREATED)
     public void createCustomerInvestment(@RequestBody Investment investment,
-                                 HttpServletRequest request, HttpServletResponse response) {
+                                 HttpServletRequest request, HttpServletResponse response) throws Exception {
     	Investment createdInvestment = this.customerInvestmentService.createInvestment(investment);
         response.setHeader("Location", request.getRequestURL().append("/").append(createdInvestment.getId()).toString());
     }
@@ -108,7 +108,7 @@ public class CustomerInvestmentController extends AbstractRestController {
             produces = {"application/json", "application/xml"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCustomerInvestment(@PathVariable("id") Long id, @RequestBody Investment investment,
-                                 HttpServletRequest request, HttpServletResponse response) {
+                                 HttpServletRequest request, HttpServletResponse response) throws Exception {
         checkResourceFound(this.customerInvestmentService.getInvestment(id));
         if (id != investment.getId()) throw new HTTP400Exception("ID doesn't match!");
         this.customerInvestmentService.updateInvestment(investment);
