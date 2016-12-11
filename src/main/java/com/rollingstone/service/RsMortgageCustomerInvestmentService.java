@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.rollingstone.dao.jpa.RsMortgageCustomerInvestmentRepository;
 import com.rollingstone.domain.Investment;
 import com.rollingstone.domain.Customer;
@@ -41,6 +42,7 @@ public class RsMortgageCustomerInvestmentService {
     public RsMortgageCustomerInvestmentService() {
     }
 
+    @HystrixCommand(fallbackMethod = "createInvestmentWithValidation")
     public Investment createInvestment(Investment investment) throws Exception {
     	Investment createdInvestment = null;
     	if (investment != null && investment.getCustomer() != null){
@@ -56,6 +58,7 @@ public class RsMortgageCustomerInvestmentService {
     		Customer customer = customerClient.getCustomer((new Long(investment.getCustomer().getId())));
     		
     		if (customer != null){
+    			log.info("Customer Validation Successful. Creating Investment with validation.");
     			createdInvestment  = customerInvestmentRepository.save(investment);
     		}else {
     			log.info("Invalid Customer");
@@ -65,6 +68,15 @@ public class RsMortgageCustomerInvestmentService {
     	else {
     			throw new Exception("Invalid Customer");
     	}
+        return createdInvestment;
+    }
+    
+    public Investment createInvestmentWithValidation(Investment investment) throws Exception {
+    	Investment createdInvestment = null;
+ 
+		log.info("Customer Validation Failed. Creating Investment without validation.");
+    	createdInvestment  = customerInvestmentRepository.save(investment);
+  
         return createdInvestment;
     }
 
